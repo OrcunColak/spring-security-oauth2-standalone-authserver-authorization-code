@@ -1,0 +1,6 @@
+server:
+  port: 64200
+
+logging:
+  level:
+    org.springframework.security: debug
