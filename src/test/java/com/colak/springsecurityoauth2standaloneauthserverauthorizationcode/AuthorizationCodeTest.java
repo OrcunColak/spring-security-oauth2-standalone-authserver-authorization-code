@@ -45,7 +45,10 @@ class AuthorizationCodeTest {
                 .build()
                 .toUriString();
 
+        // ------------------------- JESSION #1 -------------------------
         // Step 1: GET /oauth2/authorize
+        // Initiates the authorization process by redirecting the user to the authorization server's authorization endpoint. This is typically done using a GET request.
+        // GET /authorize?response_type=code&client_id=CLIENT_ID&redirect_uri=REDIRECT_URI&scope=SCOPE&state=STATE
         String preLoginSetCookieHeader = webTestClient
                 .get()
                 .uri(authorizeUrl)
@@ -57,6 +60,7 @@ class AuthorizationCodeTest {
                 .getFirst(HttpHeaders.SET_COOKIE);
 
         // Step 2: GET /login
+        // The user is presented with an authorization screen
         webTestClient.get()
                 .uri("/login")
                 .header(HttpHeaders.COOKIE, preLoginSetCookieHeader) // optional
@@ -68,6 +72,7 @@ class AuthorizationCodeTest {
         System.out.println(preLoginSetCookieHeader);
 
         // Step 3: POST /login
+        // log in and grant permission for the client to access their resources.
         MultiValueMap<String, String> formData = new LinkedMultiValueMap<>();
         formData.add("username", USERNAME);
         formData.add("password", PASSWORD);
@@ -82,12 +87,17 @@ class AuthorizationCodeTest {
                 .returnResult(String.class)
                 .getResponseHeaders();
 
+        // ------------------------- JESSION #2 -------------------------
+        // Upon successful user authorization, the authorization server redirects the user back to the client application's
+        // specified redirect URI
         String postLoginRedirectLocation = loginResponseHeaders.getFirst(HttpHeaders.LOCATION);
         String postLoginSetCookieHeader = loginResponseHeaders.getFirst(HttpHeaders.SET_COOKIE);
 
         assert postLoginRedirectLocation != null;
         System.out.println(loginResponseHeaders);
+
         // Step 4: GET /oauth2/authorize
+        // Obtain authorization code from redirect URI
         String redirectUrlWithAuthorizationCode = webTestClient.get()
                 .uri(postLoginRedirectLocation)
                 .header(HttpHeaders.COOKIE, postLoginSetCookieHeader)
@@ -100,6 +110,8 @@ class AuthorizationCodeTest {
         String authorizationCode = extractAuthorizationCode(redirectUrlWithAuthorizationCode);
 
         // Step 5: POST /oauth2/token
+        // The client uses the obtained authorization code to make a secure POST request to the authorization server's
+        // token endpoint to exchange it for an access token.
         webTestClient.post()
                 .uri("oauth2/token")
                 .headers(headers -> headers.setBasicAuth(CLIENT_ID, CLIENT_SECRET, StandardCharsets.UTF_8))
