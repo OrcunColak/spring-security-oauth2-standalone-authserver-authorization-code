@@ -26,7 +26,7 @@ class AuthorizationCodeTest {
     private WebTestClient webTestClient;
 
     private static final String CLIENT_ID = "oidc-client";
-    private static final String CLIENT_SECRET = "{noop}secret";
+    private static final String CLIENT_SECRET = "secret";
     private static final String SCOPE = "openid";
     private static final String STATE = "123xyz";
     private static final String USERNAME = "user";

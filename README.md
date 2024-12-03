@@ -1,2 +1,24 @@
+# Read me
+
 The original idea is from  
 https://towardsdev.com/end-to-end-test-cases-for-spring-authorization-server-using-webclient-e3ed0397e036
+
+# Get Token
+
+```
+curl -X POST http://localhost:64200/oauth2/token -u "oidc-client:secret" -H "Content-Type:application/x-www-form-urlencoded" -d "grant_type=client_credentials"
+```
+
+Response
+
+```
+{"access_token":"
+eyJraWQiOiI5OWMxZjQ1Yy1mODRlLTQxNjQtYWU5ZS0wZDhjOGMzNGI0OTEiLCJhbGciOiJSUzI1NiJ9.eyJzdWIiOiJvaWRjLWNsaWVudCIsImF1ZCI6Im9pZGMtY2xpZW50IiwibmJmIjoxNzMzMjE5ODc5LCJpc3MiOiJodHRwOi8vbG9jYWxob3N0OjY0MjAwIiwiZXhwIjoxNzMzMjIwMTc5LCJpYXQiOjE3MzMyMTk4NzksImp0aSI6IjVjM2Q3NjQ1LTkwNjQtNGRiZC1iOTg2LWNiZGE0YmE4MWRjNCJ9.nAwOcIyn8B8z6MFjlb8oNvtbr0aV6HCeOvnR-KknXFClu2cXayjRN16nh4OIenCFOJVO-PC-ExRqGs8azmlMoHpoAA_
+-bTBxzwJ5WrRq3V2v4wjR6kGMW0Bpubf9lAd5rRU83ONFk349Less8rYpkFAwbYpfOjJtZH-Sa1VBwHF8neMWFjRX4oyDsQHYLu-g4qjxyYqF3jlWVJIPPlsHypzRcARocF6p0ywmx9-lKd8TidtCqyECBwoV6zslSXb_muiJB8LIqxhT2V0IkGyD2YZlRy_7RQwEyKsBLUxMo0syyNsmrc-hxJU85CBwQB7SvcAFME-6p2MM0gwf2JASJQ","
+token_type":"Bearer","expires_in":299}
+```
+
+# Logout
+```
+curl -i -X POST http://localhost:64200/oauth2/revoke -u "oidc-client:secret" -H "Content-Type: application/x-www-form-urlencoded" -d "token= eyJraWQiOiI5OWMxZjQ1Yy1mODRlLTQxNjQtYWU5ZS0wZDhjOGMzNGI0OTEiLCJhbGciOiJSUzI1NiJ9.eyJzdWIiOiJvaWRjLWNsaWVudCIsImF1ZCI6Im9pZGMtY2xpZW50IiwibmJmIjoxNzMzMjIwMzk4LCJpc3MiOiJodHRwOi8vbG9jYWxob3N0OjY0MjAwIiwiZXhwIjoxNzMzMjIwNjk4LCJpYXQiOjE3MzMyMjAzOTgsImp0aSI6IjJkMjQ0OWFiLTE4ZmYtNDhmMC04NDUxLWY4YTJhYWVkZDQ0MCJ9.rWT54MJniifaxoRC12K56TBLBsuDbRsv7nmh2rpsJqqMjK-gvj2S7Q3yMg8Kwz06OWiPrTPzQNZck9SaiS1AMeMd0x2s-gJEIZesGLsIfb6dXQo1OEtW9n5A6myadgbwUSk374FXl1VuI_rla5zIYatUZKAFjnJjtqrJBlnqcwAsgfHER4JC5vfpxjAJaX9u6S9Jf_PmKjW7B981Krn1PzvZzrWIPOD2YnjMI-eZ54fSeM8P-iZ_pd1HI89qX0XwF954_iRghQLjThT7AuoMkqpKClGbB8WgT4VEh4VfJ3RtwMixgr5MscU5TWqLfrQTWlw_-ia9lRR6OKJRKOzxEA"
+```
