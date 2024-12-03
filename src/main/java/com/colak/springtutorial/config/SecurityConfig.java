@@ -1,8 +1,5 @@
 package com.colak.springtutorial.config;
 
-import com.nimbusds.jose.jwk.JWKSet;
-import com.nimbusds.jose.jwk.RSAKey;
-import com.nimbusds.jose.jwk.source.ImmutableJWKSet;
 import com.nimbusds.jose.jwk.source.JWKSource;
 import com.nimbusds.jose.proc.SecurityContext;
 import org.springframework.context.annotation.Bean;
@@ -36,10 +33,6 @@ import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.LoginUrlAuthenticationEntryPoint;
 import org.springframework.security.web.util.matcher.MediaTypeRequestMatcher;
 
-import java.security.KeyPair;
-import java.security.KeyPairGenerator;
-import java.security.interfaces.RSAPrivateKey;
-import java.security.interfaces.RSAPublicKey;
 import java.util.List;
 import java.util.UUID;
 
@@ -57,7 +50,18 @@ public class SecurityConfig {
     @Order(1)
     public SecurityFilterChain authorizationServerSecurityFilterChain(HttpSecurity http)
             throws Exception {
-        OAuth2AuthorizationServerConfiguration.applyDefaultSecurity(http);
+        // This is deprecated
+        // OAuth2AuthorizationServerConfiguration.applyDefaultSecurity(http);
+
+        OAuth2AuthorizationServerConfigurer authorizationServerConfigurer =
+                OAuth2AuthorizationServerConfigurer.authorizationServer();
+        http
+                .securityMatcher(authorizationServerConfigurer.getEndpointsMatcher())
+                .with(authorizationServerConfigurer, Customizer.withDefaults())
+                .authorizeHttpRequests((authorize) ->
+                        authorize.anyRequest().authenticated()
+                );
+
         http.getConfigurer(OAuth2AuthorizationServerConfigurer.class)
                 .oidc(Customizer.withDefaults());    // Enable OpenID Connect 1.0
         http
@@ -115,7 +119,10 @@ public class SecurityConfig {
                 .clientSecret(passwordEncoder().encode("secret"))
                 .clientAuthenticationMethod(ClientAuthenticationMethod.CLIENT_SECRET_BASIC)
 
+                // Used for authorizing end-users through the authorization process and providing an access code.
                 .authorizationGrantType(AuthorizationGrantType.AUTHORIZATION_CODE)
+
+                // Used for refreshing the access token without re-authenticating the client
                 .authorizationGrantType(AuthorizationGrantType.REFRESH_TOKEN)
                 .authorizationGrantType(AuthorizationGrantType.CLIENT_CREDENTIALS)
 
@@ -139,31 +146,6 @@ public class SecurityConfig {
                 ;
             }
         };
-    }
-
-    @Bean
-    public JWKSource<SecurityContext> jwkSource() {
-        KeyPair keyPair = generateRsaKey();
-        RSAPublicKey publicKey = (RSAPublicKey) keyPair.getPublic();
-        RSAPrivateKey privateKey = (RSAPrivateKey) keyPair.getPrivate();
-        RSAKey rsaKey = new RSAKey.Builder(publicKey)
-                .privateKey(privateKey)
-                .keyID(UUID.randomUUID().toString())
-                .build();
-        JWKSet jwkSet = new JWKSet(rsaKey);
-        return new ImmutableJWKSet<>(jwkSet);
-    }
-
-    private static KeyPair generateRsaKey() {
-        KeyPair keyPair;
-        try {
-            KeyPairGenerator keyPairGenerator = KeyPairGenerator.getInstance("RSA");
-            keyPairGenerator.initialize(2048);
-            keyPair = keyPairGenerator.generateKeyPair();
-        } catch (Exception ex) {
-            throw new IllegalStateException(ex);
-        }
-        return keyPair;
     }
 
     @Bean
