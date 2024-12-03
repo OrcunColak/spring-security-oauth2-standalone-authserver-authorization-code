@@ -1,4 +1,4 @@
-package com.colak.springsecurityoauth2standaloneauthserverauthorizationcode;
+package com.colak.springtutorial;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
